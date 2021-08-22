@@ -1,1 +1,0 @@
-[{"username":"adminadmin","password":"adminadmin","color":"blue"},{"username":"MemeFrug","password":"maxy1234","color":"blue"},{"username":"TheRedFrog","password":"funnything","color":"blue"},{"username":"nate","password":"natel123","color":"red"},{"username":"mango is gay 2","password":"cheeseburgers4m","color":"green"}]
