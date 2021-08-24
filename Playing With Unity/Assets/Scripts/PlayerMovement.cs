@@ -305,7 +305,6 @@ public class PlayerMovement : NetworkBehaviour {
             
         //Perform the rotations
         playerCam.transform.localRotation = Quaternion.Euler(xRotation, desiredX, wallRunCameraTilt);
-        transform.rotation = Quaternion.Euler(-wallRunCameraTilt,0,0);
         orientation.transform.localRotation = Quaternion.Euler(0, desiredX, 0);
 
         //While wallRunning

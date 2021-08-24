@@ -50,7 +50,18 @@ public class Player : NetworkBehaviour
         if (PauseMenu.GameIsPaused) return;
 
         if (Input.GetAxisRaw("Mouse ScrollWheel") > 0f)
-        {
+        {   
+            selectedWeaponLocal--;
+
+            if (selectedWeaponLocal < 0){
+                selectedWeaponLocal = weaponArray.Length - 1;
+            }
+
+            Update_Inventory();
+
+            CmdChangeActiveWeapon(selectedWeaponLocal);
+        }
+        else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0f) {
             selectedWeaponLocal++;
 
             if (selectedWeaponLocal > weaponArray.Length - 1) 
@@ -58,14 +69,7 @@ public class Player : NetworkBehaviour
                 selectedWeaponLocal = 0; 
             }
 
-            CmdChangeActiveWeapon(selectedWeaponLocal);
-        }
-        else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0f) {
-            selectedWeaponLocal--;
-
-            if (selectedWeaponLocal < 0){
-                selectedWeaponLocal = weaponArray.Length - 1;
-            }
+            Update_Inventory();
 
             CmdChangeActiveWeapon(selectedWeaponLocal);
         }
@@ -157,7 +161,12 @@ public class Player : NetworkBehaviour
         {
             i++;
             var name = e.name;
-            InventoryChildrenUI[i].GetComponentInChildren<TMP_Text>().text = name;
+            InventoryChildrenUI[i].GetComponentInChildren<TMP_Text>().text = $"{name} .{i}";
+            if (i - 1 == selectedWeaponLocal) InventoryChildrenUI[i].GetComponentInChildren<TMP_Text>().color = new Color(0f,0f,0f, 1f);
+            else InventoryChildrenUI[i].GetComponentInChildren<TMP_Text>().color = new Color(1f,1f,1f, 1f);
+
+            Debug.Log(i-1);
+            Debug.Log(selectedWeaponLocal);
         }
     }
 
@@ -285,13 +294,11 @@ public class Player : NetworkBehaviour
 
         if (hit.transform.GetComponent<BulletImpact>() != null) {
             BulletImpact = hit.transform.GetComponent<BulletImpact>().BulletImpactParticle;
-            Debug.Log(BulletImpact);
         } else BulletImpact = null;
 
         Object component;
         if (hit.transform.GetComponent<Object>() != null && !exiting) {
             component = hit.transform.GetComponent<Object>();
-            component.OnHit(bullet.damage);
         }
 
         RpcBulletImpact(hit.point, hit.normal);
