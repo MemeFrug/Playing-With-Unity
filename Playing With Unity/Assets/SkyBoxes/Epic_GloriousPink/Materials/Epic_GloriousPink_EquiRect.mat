@@ -25,7 +25,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Exposure: 1
+    - _Lod: 0
+    - _LodLevel: 0
     - _Rotation: 0
+    - _Saturation: 1
     m_Colors:
+    - _Euler: {r: 0, g: 0, b: 0, a: 1}
+    - _Rotation1: {r: 1, g: 0, b: 0, a: 1}
+    - _Rotation2: {r: 0, g: 1, b: 0, a: 1}
+    - _Rotation3: {r: 0, g: 0, b: 1, a: 1}
     - _Tint: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
   m_BuildTextureStacks: []
