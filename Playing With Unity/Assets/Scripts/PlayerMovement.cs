@@ -109,10 +109,10 @@ public class PlayerMovement : NetworkBehaviour {
     public int doubleJumpsLeft = 1;
 
     private void WallRunInput() {
-        if (Input.GetKey(KeyCode.D) && isWallRight)
+        if (Input.GetKey(KeyCode.D) && isWallRight && rb.velocity.magnitude >= 20f)
             StartWallRun();
         
-        if (Input.GetKey(KeyCode.A) && isWallLeft)
+        if (Input.GetKey(KeyCode.A) && isWallLeft && rb.velocity.magnitude >= 20f)
             StartWallRun();
         
     }
