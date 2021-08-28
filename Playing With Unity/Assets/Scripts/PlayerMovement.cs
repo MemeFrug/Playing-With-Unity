@@ -87,8 +87,7 @@ public class PlayerMovement : NetworkBehaviour {
         }
 
         if (transform.position.y <= DeathPointy) {
-            GameObject respawn = GameObject.FindWithTag("Respawn");
-            transform.position = new Vector3(respawn.transform.position.x, respawn.transform.position.y, respawn.transform.position.z);
+            GetComponent<Player>().Respawn("Fell Of The Map");
         }
     }
     /// <summary>

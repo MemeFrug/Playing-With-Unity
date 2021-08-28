@@ -59,6 +59,10 @@ public class GrapplingGun : MonoBehaviour {
     }
     
     public void Update_UI() {
+        if (AmmoUI == null) {
+            Debug.Log("Error at Update_UI() In GrapplingGun.cs");
+            return;
+        }
         if (MaxAmmo == Mathf.Infinity) 
         AmmoUI.text = "";
         else 

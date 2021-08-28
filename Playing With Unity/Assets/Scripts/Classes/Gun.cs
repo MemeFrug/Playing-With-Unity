@@ -5,10 +5,14 @@ using TMPro;
 
 public class Gun : MonoBehaviour
 {
+    public bool isgun = true;
 
     public Player Player;
     public Transform BulletShootPos;
     public Transform Rotation;
+
+    public Transform LeftHandle;
+    public Transform RightHandle;
 
     public ParticleSystem muzzleflash;
 
@@ -52,8 +56,9 @@ public class Gun : MonoBehaviour
     // public LayerMask layermaskguninwall;
 
     private void Awake() {
+        if (!isgun) return;
         MaxAmmo = ammo;
-        originalPos = transform.position;
+        originalPos = transform.localPosition;
 
         AmmoUI = GameObject.FindWithTag("AmmoCount").GetComponent<TMP_Text>();
     }
@@ -63,7 +68,8 @@ public class Gun : MonoBehaviour
     }
 
     private void Update() {
-        if (!Player.isLocalPlayer) return;
+        if (!isgun) return;
+        if (!Player.isLocalPlayer && PauseMenu.GameIsPaused) return;
 
         //Allowed to shoot
         // RaycastHit RayInfo;
@@ -84,9 +90,9 @@ public class Gun : MonoBehaviour
 
         if (Input.GetMouseButtonDown(1)) {
             Debug.Log("Scoping");
-            transform.position = ZoomPos;
+            transform.localPosition = ZoomPos;
         } else if (Input.GetMouseButtonUp(1)){
-            transform.position = originalPos;
+            transform.localPosition = originalPos;
             Debug.Log(originalPos);
         }
 
@@ -130,10 +136,12 @@ public class Gun : MonoBehaviour
     }
 
     private void OnEnable() {
+        if (!isgun) return;
         Update_Ui();
     }
 
     private void OnDisable() {
+        if (!isgun) return;
         isreloading = false;
         isshooting = false;
         AmmoUI.text = $"0/0";

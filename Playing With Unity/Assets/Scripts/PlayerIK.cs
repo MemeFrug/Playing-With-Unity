@@ -4,12 +4,14 @@ using System.Collections;
 
 [RequireComponent(typeof(Animator))] 
 
-public class IKControl : MonoBehaviour {
+public class PlayerIK : MonoBehaviour {
     
     protected Animator animator;
     
-    public bool ikActive = false;
+    public bool ikActive = true;
     public Transform rightHandObj = null;
+
+    public Transform leftHandObj = null;
 
     void Start () 
     {
@@ -31,6 +33,13 @@ public class IKControl : MonoBehaviour {
                     animator.SetIKPosition(AvatarIKGoal.RightHand,rightHandObj.position);
                     animator.SetIKRotation(AvatarIKGoal.RightHand,rightHandObj.rotation);
                 }        
+
+                if (leftHandObj != null) {
+                    animator.SetIKPositionWeight(AvatarIKGoal.LeftHand,1);
+                    animator.SetIKRotationWeight(AvatarIKGoal.LeftHand,1);  
+                    animator.SetIKPosition(AvatarIKGoal.LeftHand,leftHandObj.position);
+                    animator.SetIKRotation(AvatarIKGoal.LeftHand,leftHandObj.rotation);
+                }
                 
             }
             
@@ -38,6 +47,8 @@ public class IKControl : MonoBehaviour {
             else {          
                 animator.SetIKPositionWeight(AvatarIKGoal.RightHand,0);
                 animator.SetIKRotationWeight(AvatarIKGoal.RightHand,0); 
+                animator.SetIKPositionWeight(AvatarIKGoal.LeftHand,0);
+                animator.SetIKRotationWeight(AvatarIKGoal.LeftHand,0); 
                 animator.SetLookAtWeight(0);
             }
         }

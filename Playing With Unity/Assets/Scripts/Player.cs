@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 using TMPro;
 
+
 public class Player : NetworkBehaviour
 {
     public bool islocal = true;
@@ -28,7 +29,7 @@ public class Player : NetworkBehaviour
                 child.gameObject.layer = 0;
             }
 
-        }
+        }else OnWeaponChanged(selectedWeaponLocal, selectedWeaponLocal);
     }
 
     void Update()
@@ -39,6 +40,8 @@ public class Player : NetworkBehaviour
             floatingInfo.transform.LookAt(Camera.main.transform);
             return;
         }
+
+        if (PlayersHealth <= 0) Respawn("Health Went Below 0");
 
         //Only the client that owns this object executes this code
         if (myCam.enabled == false)
@@ -74,6 +77,14 @@ public class Player : NetworkBehaviour
             CmdChangeActiveWeapon(selectedWeaponLocal);
         }
     }
+
+    public void Respawn(string reason) {
+        Debug.Log("Died Because: "+reason);
+
+        GameObject respawn = GameObject.FindWithTag("Respawn");
+        transform.position = respawn.transform.position;
+    }
+
     public TextMesh playerNameText;
     public GameObject floatingInfo;
 
@@ -122,15 +133,16 @@ public class Player : NetworkBehaviour
     private int selectedWeaponLocal = 0;
     public GameObject[] weaponArray;
 
+    public GameObject PlayerModle;
+
     [SyncVar(hook = nameof(OnWeaponChanged))]
     public int activeWeaponSynced = 0;
 
-    void OnWeaponChanged(int _Old, int _New)
-    {
+    void OnWeaponChanged(int _Old, int _New){
         // disable old weapon
         // in range and not null
         if (_Old >= 0 && _Old <= weaponArray.Length - 1 && weaponArray[_Old] != null)
-        {
+        {   
             weaponArray[_Old].SetActive(false);
         }
         
@@ -138,6 +150,21 @@ public class Player : NetworkBehaviour
         // in range and not null
         if (_New >= 0 && _New <= weaponArray.Length - 1 && weaponArray[_New] != null)
         {
+            if (weaponArray[_New].GetComponent<Gun>() != null) {
+                if (weaponArray[_New].GetComponent<Gun>().LeftHandle != null )
+                    PlayerModle.GetComponent<PlayerIK>().leftHandObj = weaponArray[_New].GetComponent<Gun>().LeftHandle;
+                else {
+                    PlayerModle.GetComponent<PlayerIK>().leftHandObj = null;
+                }
+            }
+            if (weaponArray[_New].GetComponent<Gun>() != null) {
+                if (weaponArray[_New].GetComponent<Gun>().RightHandle != null)
+                    PlayerModle.GetComponent<PlayerIK>().rightHandObj = weaponArray[_New].GetComponent<Gun>().RightHandle;
+                else {
+                    PlayerModle.GetComponent<PlayerIK>().rightHandObj = null;
+                }
+            }
+            
             weaponArray[_New].SetActive(true);
         }
     }
@@ -282,19 +309,23 @@ public class Player : NetworkBehaviour
         bullets.RemoveAll(bullet => bullet.time >= bullet.MaxLifeTime);
     }
 
-    void RaycastHit(Bullet bullet, RaycastHit hit, bool exiting) {
-        if (hit.rigidbody != null && !exiting) hit.rigidbody.AddForceAtPosition(myCam.transform.forward * bullet.ForceAdd, hit.point);
+    void RaycastHit(Bullet bullet, RaycastHit hit) {
+        if (hit.rigidbody != null) hit.rigidbody.AddForceAtPosition(myCam.transform.forward * bullet.ForceAdd, hit.point);
 
         bullet.tracer.transform.position = hit.point;
-        bullet.time += 0.5f;
+        bullet.time += Time.deltaTime + 2;
 
         if (hit.transform.GetComponent<BulletImpact>() != null) {
             BulletImpact = hit.transform.GetComponent<BulletImpact>().BulletImpactParticle;
         } else BulletImpact = null;
 
         Object component;
-        if (hit.transform.GetComponent<Object>() != null && !exiting) {
+        if (hit.transform.GetComponent<Object>() != null) {
             component = hit.transform.GetComponent<Object>();
+        }
+
+        if (hit.transform.GetComponent<Player>() != null) {
+            hit.transform.GetComponent<Player>().PlayersHealth -= bullet.damage;
         }
 
         RpcBulletImpact(hit.point, hit.normal);
@@ -308,13 +339,13 @@ public class Player : NetworkBehaviour
         if (Physics.Raycast(ray, out hit, distance)) {
             if (hit.collider.gameObject.GetComponent<Player>() != null) {
                 if (hit.collider.gameObject.GetComponent<Player>().isLocalPlayer) {
-                    if (bullet.tracer != null) bullet.tracer.transform.position = end;
+                    // if (bullet.tracer != null) bullet.tracer.transform.position = end;
                     return;
                 }
             }
 
             //Create a dust and bullet hole with movement of rigidbodys
-            RaycastHit(bullet, hit, false);
+            RaycastHit(bullet, hit);
             
         }else {
             
