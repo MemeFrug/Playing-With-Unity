@@ -11,7 +11,8 @@ public class Gun : MonoBehaviour
     public Transform Rotation;
 
     public ParticleSystem muzzleflash;
-    public GameObject BulletImpactPrefab;
+
+    public Transform CrossHairTarget;
 
     public float damage = 10f;
     public float range = 200f;
@@ -41,6 +42,10 @@ public class Gun : MonoBehaviour
 
     public float MaxLifeTime = 3.0f;
 
+    public Vector3 ZoomPos;
+
+    private Vector3 originalPos;
+
     // public bool allowedtoshoot = true;
 
     // //Laymerask for checking if in wall
@@ -48,6 +53,7 @@ public class Gun : MonoBehaviour
 
     private void Awake() {
         MaxAmmo = ammo;
+        originalPos = transform.position;
 
         AmmoUI = GameObject.FindWithTag("AmmoCount").GetComponent<TMP_Text>();
     }
@@ -76,6 +82,14 @@ public class Gun : MonoBehaviour
             shoot();
         }
 
+        if (Input.GetMouseButtonDown(1)) {
+            Debug.Log("Scoping");
+            transform.position = ZoomPos;
+        } else if (Input.GetMouseButtonUp(1)){
+            transform.position = originalPos;
+            Debug.Log(originalPos);
+        }
+
         
         else if (Input.GetMouseButtonUp(0)) {
             shootmouseup();
@@ -91,7 +105,7 @@ public class Gun : MonoBehaviour
             if (ammo > 0) {
                 ammo--;
                 Update_Ui();
-                Player.CmdShootBullet(damage, range, BulletShootPos.position, impactforce, bulletDrop, bulletSpeed, MaxLifeTime);
+                Player.CmdShootBullet(damage, BulletShootPos.position, impactforce, bulletDrop, bulletSpeed, MaxLifeTime);
             }
             else reload();
         }

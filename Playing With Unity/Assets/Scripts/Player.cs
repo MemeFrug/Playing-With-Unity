@@ -209,6 +209,8 @@ public class Player : NetworkBehaviour
     }
 
 
+    //GUNS/BULLETS
+
     public TrailRenderer bulletTrail;
 
     //Need to make it dependant on what surface
@@ -233,13 +235,10 @@ public class Player : NetworkBehaviour
 
         public float MaxLifeTime;
 
-        public int amountoftimescangothroughwall = 1; //Must be less than 2 or 1 i dunno
-
         public float bulletSpeed;
     }
 
     List<Bullet> bullets = new List<Bullet>();
-    List<Bullet> bulletstoadd = new List<Bullet>();
 
     Vector3 GetPosition(Bullet bullet) {
         //p + v*t + 0.5*g*t*t
@@ -247,7 +246,7 @@ public class Player : NetworkBehaviour
         return (bullet.initialPosition) + (bullet.initialVelocity*bullet.time) + (0.5f * gravity * bullet.time * bullet.time);
     }
 
-    Bullet CreateBullet(Vector3 position, Vector3 velocity, float damage, float ForceAdd, float bulletDrop, float MaxLifeTime, int amountoftimescangothroughwall, float bulletSpeed) {
+    Bullet CreateBullet(Vector3 position, Vector3 velocity, float damage, float ForceAdd, float bulletDrop, float MaxLifeTime, float bulletSpeed) {
         Bullet bullet = new Bullet();
         bullet.initialPosition = position;
         bullet.initialVelocity = velocity;
@@ -261,7 +260,6 @@ public class Player : NetworkBehaviour
 
         bullet.MaxLifeTime = MaxLifeTime;
 
-        bullet.amountoftimescangothroughwall = amountoftimescangothroughwall;
         bullet.bulletSpeed = bulletSpeed;
         return bullet;
     }
@@ -278,8 +276,6 @@ public class Player : NetworkBehaviour
             Vector3 p1 = GetPosition(bullet);
             RaycastSegment(p0, p1, bullet);
         });
-
-        bullets.AddRange(bulletstoadd);
     }
 
     void DestroyBullets() {
@@ -290,7 +286,7 @@ public class Player : NetworkBehaviour
         if (hit.rigidbody != null && !exiting) hit.rigidbody.AddForceAtPosition(myCam.transform.forward * bullet.ForceAdd, hit.point);
 
         bullet.tracer.transform.position = hit.point;
-        bullet.time = bullet.MaxLifeTime;
+        bullet.time += 0.5f;
 
         if (hit.transform.GetComponent<BulletImpact>() != null) {
             BulletImpact = hit.transform.GetComponent<BulletImpact>().BulletImpactParticle;
@@ -310,6 +306,13 @@ public class Player : NetworkBehaviour
 
         ray = new Ray(start, direction);
         if (Physics.Raycast(ray, out hit, distance)) {
+            if (hit.collider.gameObject.GetComponent<Player>() != null) {
+                if (hit.collider.gameObject.GetComponent<Player>().isLocalPlayer) {
+                    if (bullet.tracer != null) bullet.tracer.transform.position = end;
+                    return;
+                }
+            }
+
             //Create a dust and bullet hole with movement of rigidbodys
             RaycastHit(bullet, hit, false);
             
@@ -323,7 +326,7 @@ public class Player : NetworkBehaviour
     RaycastHit hit;
 
     [Command]
-    public void CmdShootBullet(float damage, float range, Vector3 position, float ForceAdd, float bulletDrop, float bulletSpeed, float MaxLifeTime) {
+    public void CmdShootBullet(float damage, Vector3 position, float ForceAdd, float bulletDrop, float bulletSpeed, float MaxLifeTime) {
         RpcBeforeShootBullet(position, bulletSpeed, damage, ForceAdd, bulletDrop, MaxLifeTime);
     }
 
@@ -334,7 +337,7 @@ public class Player : NetworkBehaviour
 
         //show bullet here
         Vector3 velocity = (raycastDestination.position - position).normalized * bulletSpeed;
-        var bullet = CreateBullet(position, velocity, damage, ForceAdd, bulletDrop, MaxLifeTime, 1, bulletSpeed);
+        var bullet = CreateBullet(position, velocity, damage, ForceAdd, bulletDrop, MaxLifeTime, bulletSpeed);
         bullets.Add(bullet);
     }
 
@@ -347,7 +350,6 @@ public class Player : NetworkBehaviour
             GameObject hole = Instantiate(DefaultBulletImpact, hitpoint, Quaternion.LookRotation(hitnormal));
             hole.transform.localPosition += .01f*hitnormal;
             hole.transform.parent = hit.transform;
-            Debug.Log(hit.transform);
         }
         else {
             GameObject hole = Instantiate(BulletImpact, hitpoint, Quaternion.LookRotation(hitnormal));
