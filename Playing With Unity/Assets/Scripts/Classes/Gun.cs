@@ -5,14 +5,12 @@ using TMPro;
 
 public class Gun : MonoBehaviour
 {
+
     public bool isgun = true;
 
     public Player Player;
     public Transform BulletShootPos;
     public Transform Rotation;
-
-    public Transform LeftHandle;
-    public Transform RightHandle;
 
     public ParticleSystem muzzleflash;
 
@@ -74,6 +72,14 @@ public class Gun : MonoBehaviour
         //Allowed to shoot
         // RaycastHit RayInfo;
 
+        if (Input.GetMouseButtonDown(1)) {
+            Debug.Log("Scoping");
+            transform.localPosition = ZoomPos;
+        } else if (Input.GetMouseButtonUp(1)){
+            transform.localPosition = originalPos;
+            Debug.Log(originalPos);
+        }
+
         if (Input.GetMouseButtonDown(0)) {
             // if (Physics.Raycast(BulletShootPos.position, (BulletShootPos.position - Player.myCam.transform.position).normalized, out RayInfo, Vector3.Distance(BulletShootPos.position, Player.myCam.transform.position), layermaskguninwall)) {
             //     Debug.LogWarning("In a wall right now please implement a better way of doing this");
@@ -87,18 +93,10 @@ public class Gun : MonoBehaviour
             // allowedtoshoot = true;
             shoot();
         }
-
-        if (Input.GetMouseButtonDown(1)) {
-            Debug.Log("Scoping");
-            transform.localPosition = ZoomPos;
-        } else if (Input.GetMouseButtonUp(1)){
-            transform.localPosition = originalPos;
-            Debug.Log(originalPos);
-        }
-
         
         else if (Input.GetMouseButtonUp(0)) {
             shootmouseup();
+            Player.RpcShootingMouseUp();
         }
 
         if (Input.GetKeyDown(KeyCode.R)) {

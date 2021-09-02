@@ -133,8 +133,6 @@ public class Player : NetworkBehaviour
     private int selectedWeaponLocal = 0;
     public GameObject[] weaponArray;
 
-    public GameObject PlayerModle;
-
     [SyncVar(hook = nameof(OnWeaponChanged))]
     public int activeWeaponSynced = 0;
 
@@ -149,22 +147,7 @@ public class Player : NetworkBehaviour
         // enable new weapon
         // in range and not null
         if (_New >= 0 && _New <= weaponArray.Length - 1 && weaponArray[_New] != null)
-        {
-            if (weaponArray[_New].GetComponent<Gun>() != null) {
-                if (weaponArray[_New].GetComponent<Gun>().LeftHandle != null )
-                    PlayerModle.GetComponent<PlayerIK>().leftHandObj = weaponArray[_New].GetComponent<Gun>().LeftHandle;
-                else {
-                    PlayerModle.GetComponent<PlayerIK>().leftHandObj = null;
-                }
-            }
-            if (weaponArray[_New].GetComponent<Gun>() != null) {
-                if (weaponArray[_New].GetComponent<Gun>().RightHandle != null)
-                    PlayerModle.GetComponent<PlayerIK>().rightHandObj = weaponArray[_New].GetComponent<Gun>().RightHandle;
-                else {
-                    PlayerModle.GetComponent<PlayerIK>().rightHandObj = null;
-                }
-            }
-            
+        {   
             weaponArray[_New].SetActive(true);
         }
     }
@@ -339,7 +322,7 @@ public class Player : NetworkBehaviour
         if (Physics.Raycast(ray, out hit, distance)) {
             if (hit.collider.gameObject.GetComponent<Player>() != null) {
                 if (hit.collider.gameObject.GetComponent<Player>().isLocalPlayer) {
-                    // if (bullet.tracer != null) bullet.tracer.transform.position = end;
+                    if (bullet.tracer != null) bullet.tracer.transform.position = end;
                     return;
                 }
             }
@@ -361,10 +344,21 @@ public class Player : NetworkBehaviour
         RpcBeforeShootBullet(position, bulletSpeed, damage, ForceAdd, bulletDrop, MaxLifeTime);
     }
 
+    
+    public Animator animator;
+
+    [ClientRpc]
+    public void RpcShootingMouseUp() {
+        //Do animations
+             
+    }
+
     [ClientRpc]
     public void RpcBeforeShootBullet(Vector3 position, float bulletSpeed, float damage, float ForceAdd, float bulletDrop, float MaxLifeTime){
         //Show muzzle flash
         MuzzleFlash.Play();
+
+        animator.SetBool("Shooting", true);
 
         //show bullet here
         Vector3 velocity = (raycastDestination.position - position).normalized * bulletSpeed;
