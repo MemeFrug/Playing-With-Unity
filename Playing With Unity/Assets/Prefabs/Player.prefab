@@ -8069,7 +8069,6 @@ GameObject:
   - component: {fileID: 6886771373697393199}
   - component: {fileID: 6737326214515435004}
   - component: {fileID: 1994357980133542788}
-  - component: {fileID: 4859095158529026938}
   - component: {fileID: 945170088791993371}
   m_Layer: 0
   m_Name: Main Camera
@@ -8169,7 +8168,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 1
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -8179,14 +8178,6 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
---- !u!124 &4859095158529026938
-Behaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8186635155129977837}
-  m_Enabled: 1
 --- !u!114 &945170088791993371
 MonoBehaviour:
   m_ObjectHideFlags: 0

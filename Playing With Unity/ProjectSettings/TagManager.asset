@@ -9,6 +9,7 @@ TagManager:
   - Network Manager
   - AmmoCount
   - Inventory
+  - Sun
   layers:
   - Default
   - TransparentFX
