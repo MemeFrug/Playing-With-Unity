@@ -174,9 +174,6 @@ public class Player : NetworkBehaviour
             InventoryChildrenUI[i].GetComponentInChildren<TMP_Text>().text = $"{name} .{i}";
             if (i - 1 == selectedWeaponLocal) InventoryChildrenUI[i].GetComponentInChildren<TMP_Text>().color = new Color(0f,0f,0f, 1f);
             else InventoryChildrenUI[i].GetComponentInChildren<TMP_Text>().color = new Color(1f,1f,1f, 1f);
-
-            Debug.Log(i-1);
-            Debug.Log(selectedWeaponLocal);
         }
     }
 
@@ -293,10 +290,10 @@ public class Player : NetworkBehaviour
     }
 
     void RaycastHit(Bullet bullet, RaycastHit hit) {
-        if (hit.rigidbody != null) hit.rigidbody.AddForceAtPosition(myCam.transform.forward * bullet.ForceAdd, hit.point);
+        if (hit.rigidbody != null && hit.transform.tag != "Player") hit.rigidbody.AddForceAtPosition(myCam.transform.forward * bullet.ForceAdd, hit.point);
 
         bullet.tracer.transform.position = hit.point;
-        bullet.time += Time.deltaTime + 2;
+        bullet.time = bullet.time + 1f;
 
         if (hit.transform.GetComponent<BulletImpact>() != null) {
             BulletImpact = hit.transform.GetComponent<BulletImpact>().BulletImpactParticle;

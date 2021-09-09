@@ -108,10 +108,10 @@ public class PlayerMovement : NetworkBehaviour {
     public int doubleJumpsLeft = 1;
 
     private void WallRunInput() {
-        if (Input.GetKey(KeyCode.D) && isWallRight && rb.velocity.magnitude >= 15f)
+        if (Input.GetKey(KeyCode.D) && isWallRight && Vector3.Dot(orientation.forward,rb.velocity) > 1f && !grounded)
             StartWallRun();
         
-        if (Input.GetKey(KeyCode.A) && isWallLeft && rb.velocity.magnitude >= 15f)
+        if (Input.GetKey(KeyCode.A) && isWallLeft && Vector3.Dot(orientation.forward,rb.velocity) > 1f && !grounded)
             StartWallRun();
         
     }
@@ -250,9 +250,11 @@ public class PlayerMovement : NetworkBehaviour {
             readyToJump = false;
             doubleJumpsLeft--;
 
-            //Add jump forces 
-            var velocity = rb.velocity;
-            rb.AddForce(orientation.up * jumpForce * 3f);
+            //Add jump forces
+            var velocity = new Vector2(rb.velocity.x, rb.velocity.z);
+            rb.velocity = new Vector3(velocity.x, 0, velocity.y);
+            rb.AddForce(orientation.up * jumpForce * 2);
+            rb.AddForce(new Vector3(velocity.x, 0, velocity.y) * 2);
 
             //Resets velocity
             // rb.velocity = Vector3.zero;
@@ -269,14 +271,14 @@ public class PlayerMovement : NetworkBehaviour {
             //normal jump
             if (isWallLeft && !Input.GetKey(KeyCode.D) || isWallRight && !Input.GetKey(KeyCode.A))
             {
-                rb.AddForce(orientation.up * jumpForce * 2f);
+                rb.AddForce(orientation.up * jumpForce);
                 if (isWallLeft) rb.AddForce(orientation.right * jumpForce);
                 else rb.AddForce(-orientation.right * jumpForce);
-                rb.AddForce(normalVector * jumpForce * 1f);
+                rb.AddForce(normalVector * jumpForce);
             }
 
             //sidewards wall hop
-            if (isWallRight || isWallLeft && Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) rb.AddForce(orientation.up * jumpForce * 1f);
+            if (isWallRight || isWallLeft && Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) rb.AddForce(orientation.up * jumpForce);
             if (isWallRight && Input.GetKey(KeyCode.A)) rb.AddForce(-orientation.right * jumpForce * 3.2f);
             if (isWallLeft && Input.GetKey(KeyCode.D)) rb.AddForce(orientation.right * jumpForce * 3.2f);
 
@@ -304,7 +306,7 @@ public class PlayerMovement : NetworkBehaviour {
             
         //Rotate, and also make sure we dont over- or under-rotate.
         xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+        xRotation = Mathf.Clamp(xRotation, -80f, 80f);
             
         //Perform the rotations
         playerCam.transform.localRotation = Quaternion.Euler(xRotation, desiredX, wallRunCameraTilt);
